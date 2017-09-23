@@ -7,6 +7,14 @@ app = Chalice(app_name='webhook')
 def index():
     return {'hello': 'world'}
 
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    request = app.current_request
+    json_body = request.json_body
+    print(json_body)
+    return {'speech': 'Response From Server'}
+
+
 
 # The view function above will return {"hello": "world"}
 # whenever you make an HTTP GET request to '/'.

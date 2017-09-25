@@ -1,19 +1,46 @@
 from chalice import Chalice
+from collections import defaultdict
 
 app = Chalice(app_name='webhook')
 
 
 @app.route('/')
 def index():
-    return {'hello': 'world'}
+    return {'hello': 'world22'}
 
-@app.route('/webhook', methods=['POST'])
+
+
+
+bloodGroupDict = defaultdict(int)
+@app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
-    request = app.current_request
-    json_body = request.json_body
-    print(json_body)
-    return {'speech': 'Response From Server'}
+    req = app.current_request
+    result = req.json_body.get("result")
 
+    intentName = result.get("metadata").get("intentName")
+
+
+    bloodGroup=""
+    name=""
+
+    if (intentName == "BloodDonationIntent"):
+        parameters = result.get("parameters")
+        name = parameters.get("name")
+        bloodGroup = parameters.get("bloodGroup")
+
+        current = bloodGroupDict[bloodGroup] + 1
+        bloodGroupDict[bloodGroup] = current
+        print(name, bloodGroup, current)
+        return {'speech': 'Thankyou for the donation. Now we have ' + str(current) + ' bottle(s) of blood group ' + bloodGroup}
+    elif(intentName=="InquireBlood"):
+        parameters = result.get("parameters")
+        bloodGroup = parameters.get("bloodGroup")
+        print(bloodGroup)
+        current = bloodGroupDict[bloodGroup] 
+        print(bloodGroup, current)
+        return {'speech': 'Thankyou for the Inquiry. We have ' + str(current) + ' bottle(s) of blood group ' + bloodGroup + ' available in stock'}
+
+    return {"speech": "Unable to understand the request"}
 
 
 # The view function above will return {"hello": "world"}

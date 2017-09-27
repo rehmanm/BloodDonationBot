@@ -22,7 +22,8 @@ def webhook():
 
     bloodGroup=""
     name=""
-
+    response = {"speech": "Unable to understand the request"}
+    print(intentName)
     if (intentName == "BloodDonationIntent"):
         parameters = result.get("parameters")
         name = parameters.get("name")
@@ -31,16 +32,30 @@ def webhook():
         current = bloodGroupDict[bloodGroup] + 1
         bloodGroupDict[bloodGroup] = current
         print(name, bloodGroup, current)
-        return {'speech': 'Thankyou for the donation. Now we have ' + str(current) + ' bottle(s) of blood group ' + bloodGroup}
+        response =  {'speech': 'Thankyou for the donation. Now we have ' + str(current) + ' bottle(s) of blood group ' + bloodGroup}
     elif(intentName=="InquireBlood"):
         parameters = result.get("parameters")
+        print(parameters)
         bloodGroup = parameters.get("bloodGroup")
         print(bloodGroup)
         current = bloodGroupDict[bloodGroup] 
         print(bloodGroup, current)
-        return {'speech': 'Thankyou for the Inquiry. We have ' + str(current) + ' bottle(s) of blood group ' + bloodGroup + ' available in stock'}
+        response =  {'speech': 'Thankyou for the Inquiry. We have ' + str(current) + ' bottle(s) of blood group ' + bloodGroup + ' available.'}
+    elif(intentName=="BloodNeedIntent"):
+        parameters = result.get("parameters")
+        print(parameters)
+        name = parameters.get("name")
+        bloodGroup = parameters.get("bloodGroup")
+        email = parameters.get("email")
+        current = bloodGroupDict[bloodGroup]
+        if (bloodGroup > 0):
+             bloodGroupDict[bloodGroup] = current-1
+             response =  {'speech': 'Blood is available. You can collect it in an hour '}
+        else:
+            response =  {'speech': 'Currently blood is not available. We will notify you on your email address ' + email}
 
-    return {"speech": "Unable to understand the request"}
+    print(response)
+    return response
 
 
 # The view function above will return {"hello": "world"}
